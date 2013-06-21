@@ -1,0 +1,58 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'checkstyle'
+//apply plugin: 'Xslt'
+group = "com.emagsofware"
+sourceCompatibility = 1.5
+version = '1.0'
+checkstyle {
+	configFile = file("config/checkstyle/emagsoftware_checks.xml")
+	configProperties["checkstyle.cache.file"]=file("build/cache/")
+	ignoreFailures = true;
+}
+
+/*
+task checkstyleReport(type:Xslt,dependsOn: checkstyleMain) {
+    source = checkstyle.reportsDir
+	
+    include = '*.xml'
+    destDir = checkstyle.reportsDir
+    extension = 'html'
+
+    stylesheetFile = file( 'config/checkstyle/checkstyle-noframes-sorted.xsl' )
+}
+*/
+
+repositories {
+	maven {
+		url "http://192.168.167.16:9090/nexus/content/groups/public/"
+	}
+}
+
+tasks.withType(Compile) {  
+    options.encoding = "UTF-8"  
+}  
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.8.2'
+	testCompile "org.easymock:easymock:3.0"
+	testCompile "org.springframework:spring-test:3.0.0.RELEASE"
+	testCompile "org.springframework:spring-core:3.0.0.RELEASE"
+	//testCompile "cglib:cglib:2.1.3"
+	compile "commons-lang:commons-lang:2.6"
+	compile "log4j:log4j:1.2.16"
+	compile "com.googlecode.xmemcached:xmemcached:1.3.3"
+	compile "javax.servlet:servlet-api:2.5"
+
+}
+
+uploadArchives {
+    repositories {
+		mavenDeployer {
+			repository(url: "http://192.168.167.16:9090/nexus/content/repositories/thirdparty/") {
+				authentication(userName: "admin", password: "admin123")
+			}
+		}
+	}
+}
